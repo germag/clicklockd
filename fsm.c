@@ -25,55 +25,55 @@
 static time_t t_down;
 
 /* States  definitions */
-static void state_init_unlock(const struct input_event *ev, int timeout);
-static void state_up_unlock(const struct input_event *ev, int timeout);
-static void state_down_unlock(const struct input_event *ev, int timeout);
-static void state_up_lock(const struct input_event *ev, int timeout);
+static void state_init(const struct input_event *ev, int timeout);
+static void state_btn_up(const struct input_event *ev, int timeout);
+static void state_btn_down(const struct input_event *ev, int timeout);
+static void state_locked(const struct input_event *ev, int timeout);
 
 /* Initial state */
-state_fn_ptr state = state_init_unlock;
+state_fn_ptr state = state_init;
 
 /* States  implementations */
-static void state_init_unlock(const struct input_event *ev, int timeout) {
+static void state_init(const struct input_event *ev, int timeout) {
     assert(ev != NULL);
 
     if (IS_DOWN_EVENT(ev)) {
         t_down = EVENT_TIME(ev);
-        state = state_down_unlock;
+        state = state_btn_down;
         send_btn_event(GET_EVENT(ev));
     } else { 
-        state = state_up_unlock; // Release event
+        state = state_btn_up; // Release event
     }
 }
 
-static void state_up_unlock(const struct input_event *ev, int timeout) {
+static void state_btn_up(const struct input_event *ev, int timeout) {
     assert(ev != NULL);
 
     if (IS_DOWN_EVENT(ev)) {
         t_down = EVENT_TIME(ev);
-        state = state_down_unlock;
+        state = state_btn_down;
         send_btn_event(GET_EVENT(ev));
     } 
 }
 
-static void state_down_unlock(const struct input_event *ev, int timeout) {
+static void state_btn_down(const struct input_event *ev, int timeout) {
     assert(ev != NULL);
 
     if (IS_RELEASE_EVENT(ev)) {
         if ((EVENT_TIME(ev) - t_down) >= timeout) {
-            state = state_up_lock; // Click locked
+            state = state_locked; // Click locked
         } else {
-            state = state_up_unlock;
+            state = state_btn_up;
             send_btn_event(GET_EVENT(ev));
         }
     }
 }
 
-static void state_up_lock(const struct input_event *ev, int timeout) {
+static void state_locked(const struct input_event *ev, int timeout) {
     assert(ev != NULL);
 
     if (IS_RELEASE_EVENT(ev)) {
-        state = state_up_unlock; // Click unlocked
+        state = state_btn_up; // Click unlocked
         send_btn_event(GET_EVENT(ev));
     }
 }
