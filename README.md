@@ -6,6 +6,16 @@ to the new location, and then click it again. The effect is the same as a drag a
 drop but without having to hold the mouse button for a long time
 
 
+## Requirements
+  - Linux with gcc
+  - libudev-dev
+
+For Ubuntu:
+```sh
+sudo apt install build-essential libudev-dev
+
+```
+
 ## Options
 
 **-h**  
