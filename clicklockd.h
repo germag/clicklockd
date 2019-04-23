@@ -33,7 +33,8 @@
 #include <sys/time.h>
 
 /* Defaults */
-#define BTN_TIMEOUT          2
+#define BTN_TIMEOUT_SEC      2
+#define BTN_TIMEOUT_USEC     0
 #define POLLFD_MAX          64
 #define PID_FILE            "/var/run/clicklockd.pid"
 #define DEFAULT_UINPUT_DEV  "/dev/uinput"
