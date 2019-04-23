@@ -1,18 +1,23 @@
 # Clicklockd
 
-ClickLock enables you to highlight or drag without holding down the mouse 
-button. Allows you to hold the mouse button for a few seconds, move 
-the mouse to the new location, and then click it again. The effect is the
-same as a drag and drop but without having to hold the mouse button for a 
-long time.
+Clicklockd enables you to highlight or drag without holding down the mouse button.
+This feature allows you to hold the mouse button for a few seconds, move the mouse
+to the new location, and then click it again. The effect is the same as a drag and
+drop but without having to hold the mouse button for a long time
+
 
 ## Options
 
 **-h**  
 Print help and exit.
 
-**-t timeout**  
-Set how many seconds you need to hold down a mouse or trackball button before your click is locked. Default is 2 seconds.
+**-t timeout[s|ms]**  
+Set how many seconds (s) or milliseconds (ms) you need to hold down a mouse or
+trackball button before your click is locked. You can use real numbers or integers.
+If the unit of time is not specified, clicklockd assumes seconds (s).
+Default is 2 seconds.
+
+Ex: -t 1.5s (or -t 1.5) is the same as -t 1500ms
 
 **-b**  
 Run in the background (as a Unix daemon).

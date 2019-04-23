@@ -31,12 +31,14 @@ void usage(FILE *out, const char *pname) {
                  "to the new location, and then click it again. The effect is the same as a drag and\n"
                  "drop but without having to hold the mouse button for a long time\n\n"
                  "Options:\n"
-                 "\t-h\t\t\tShow this message\n"
-                 "\t-b\t\t\tSend to background (daemonize)\n"
-                 "\t-t timeout\t\tSet timeout in seconds (default: %d)\n"
-                 "\t-p pidfile\t\tSet pid file (default: %s)\n"
-                 "\t-u uinput device\tSet uinput device (default: %s)\n", 
-                 pname, BTN_TIMEOUT, PID_FILE, DEFAULT_UINPUT_DEV);
+                 "\t-h\t\t\t\tShow this message\n"
+                 "\t-b\t\t\t\tSend to background (daemonize)\n"
+                 "\t-t timeout[s|ms]\t\tSet timeout in seconds (s) or milliseconds (ms), accepts both real numbers and integers (default: %ds)\n"
+                 "\t\t\t\t\tEx: -t 2.5s is the same as -t 2500ms\n"
+                 "\t\t\t\t\tNote: if the unit of time is not specified, clicklockd assumes seconds (s).\n"
+                 "\t-p pidfile\t\t\tSet pid file (default: %s)\n"
+                 "\t-u uinput device\t\tSet uinput device (default: %s)\n", 
+                 pname, BTN_TIMEOUT_SEC, PID_FILE, DEFAULT_UINPUT_DEV);
 }
 
 int daemon_init() {
