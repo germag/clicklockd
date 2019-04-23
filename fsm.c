@@ -23,23 +23,28 @@
 
 /* Simple (and not quite right) FSM  */
 
-static time_t t_down;
+static struct timeval down_ev_time;
+
+/* Event helpers */
+#define IS_DOWN_EVENT(ev) ((ev)->value)
+#define IS_RELEASE_EVENT(ev) (!(ev)->value)
+#define GET_EVENT(ev) ((ev)->value)
 
 /* States  definitions */
-static void state_init(const struct input_event *ev, int timeout);
-static void state_btn_up(const struct input_event *ev, int timeout);
-static void state_btn_down(const struct input_event *ev, int timeout);
-static void state_locked(const struct input_event *ev, int timeout);
+static void state_init(const struct input_event *ev, const struct timeval *timeout);
+static void state_btn_up(const struct input_event *ev, const struct timeval *timeout);
+static void state_btn_down(const struct input_event *ev, const struct timeval *timeout);
+static void state_locked(const struct input_event *ev, const struct timeval *timeout);
 
 /* Initial state */
 state_fn_ptr state = state_init;
 
 /* States  implementations */
-static void state_init(const struct input_event *ev, int timeout) {
+static void state_init(const struct input_event *ev, const struct timeval *timeout) {
     assert(ev != NULL);
 
     if (IS_DOWN_EVENT(ev)) {
-        t_down = EVENT_TIME(ev);
+        down_ev_time = ev->time;
         state = state_btn_down;
         send_btn_event(GET_EVENT(ev));
     } else { 
@@ -47,21 +52,23 @@ static void state_init(const struct input_event *ev, int timeout) {
     }
 }
 
-static void state_btn_up(const struct input_event *ev, int timeout) {
+static void state_btn_up(const struct input_event *ev, const struct timeval *timeout) {
     assert(ev != NULL);
 
     if (IS_DOWN_EVENT(ev)) {
-        t_down = EVENT_TIME(ev);
+        down_ev_time = ev->time;
         state = state_btn_down;
         send_btn_event(GET_EVENT(ev));
     } 
 }
 
-static void state_btn_down(const struct input_event *ev, int timeout) {
+static void state_btn_down(const struct input_event *ev, const struct timeval *timeout) {
     assert(ev != NULL);
 
     if (IS_RELEASE_EVENT(ev)) {
-        if ((EVENT_TIME(ev) - t_down) >= timeout) {
+        struct timeval elapsed_time;
+        timersub(&(ev->time), &down_ev_time, &elapsed_time);
+        if (timercmp(&elapsed_time, timeout, >=)) {
             state = state_locked; // Click locked
         } else {
             state = state_btn_up;
@@ -70,7 +77,7 @@ static void state_btn_down(const struct input_event *ev, int timeout) {
     }
 }
 
-static void state_locked(const struct input_event *ev, int timeout) {
+static void state_locked(const struct input_event *ev, const struct timeval *timeout) {
     assert(ev != NULL);
 
     if (IS_RELEASE_EVENT(ev)) {

@@ -30,6 +30,7 @@
 #include <syslog.h>
 #include <string.h>
 #include <assert.h>
+#include <sys/time.h>
 
 /* Defaults */
 #define BTN_TIMEOUT          2
@@ -38,7 +39,7 @@
 #define DEFAULT_UINPUT_DEV  "/dev/uinput"
 
 /* Event loop */
-int  event_loop(int timeout);
+int  event_loop(const struct timeval *timeout);
 
 /* Virtual Mouse */
 #define CLICKLOCK_VMOUSE_NAME      "ClickLock Virtual Mouse"

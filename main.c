@@ -18,17 +18,20 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 */
 #include "clicklockd.h"
+#include <sys/time.h>
 #include <limits.h>
 #include <signal.h>
+
 
 int main(int argc, char* argv[]) {
     int opt;
     int error = 1;
     int daemonize;
     sigset_t sigset;
-    int timeout = BTN_TIMEOUT;
+    struct timeval timeout = {.tv_sec = BTN_TIMEOUT, .tv_usec = 0};
     char *pidfile = PID_FILE;
     char *uinput_device = DEFAULT_UINPUT_DEV;
+    long seconds;
     
     daemonize = 0;
     while((opt = getopt(argc, argv, "hbt:p:u:")) != -1) {
@@ -37,11 +40,12 @@ int main(int argc, char* argv[]) {
                 daemonize = 1;
                 break;
             case 't':
-                timeout = strtol(optarg, NULL, 10);
-                if (timeout == LONG_MAX) {
+                seconds = strtol(optarg, NULL, 10);
+                if (seconds == LONG_MAX) {
                     fprintf(stderr, "Incorrect timeout\n");
                     exit(EXIT_FAILURE);
                 }
+                timeout.tv_sec = seconds;
                 break;
             case 'p':
                 pidfile = strdup(optarg);
@@ -60,7 +64,7 @@ int main(int argc, char* argv[]) {
     sigfillset(&sigset);
     sigprocmask(SIG_BLOCK, &sigset, NULL);
 
-    log_info("Init with timeout: %d", timeout);
+    log_info("Init with timeout: %ld", timeout.tv_sec);
     if (create_pid_file(pidfile) < 0) goto exit1;
 
     if (daemonize) {
@@ -68,7 +72,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (virtual_mouse_create(uinput_device)< 0) goto exit2;
-    error = event_loop(timeout); 
+    error = event_loop(&timeout);
     virtual_mouse_destroy();
     
 exit2:

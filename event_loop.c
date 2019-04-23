@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <strings.h>
 #include <signal.h>
@@ -152,7 +153,7 @@ static void add_device(const char *devnode) {
     }
 }
 
-static int do_event_loop(struct udev_monitor *udev_mon, int timeout) {
+static int do_event_loop(struct udev_monitor *udev_mon, const struct timeval *timeout) {
     int i;
 
     assert(udev_mon != NULL);
@@ -207,7 +208,7 @@ exit:
     return -1;
 }
 
-int event_loop(int timeout) {
+int event_loop(const struct timeval *timeout) {
     int i;
     int error;
     sigset_t sigset;

@@ -22,13 +22,9 @@
 #define CLICKLOCK_FSM_H
 
 #include "clicklockd.h"
+#include <sys/time.h>
 
-#define IS_DOWN_EVENT(ev) ((ev)->value)
-#define IS_RELEASE_EVENT(ev) (!(ev)->value)
-#define EVENT_TIME(ev) ((ev)->time.tv_sec)
-#define GET_EVENT(ev) ((ev)->value)
-
-typedef void (*state_fn_ptr)(const struct input_event *, int);
+typedef void (*state_fn_ptr)(const struct input_event *ev, const struct timeval *timeout);
 extern  state_fn_ptr state;
 
 #endif
