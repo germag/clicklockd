@@ -63,11 +63,12 @@ int main(int argc, char* argv[]) {
     sigprocmask(SIG_BLOCK, &sigset, NULL);
 
     log_info("Init with timeout: %lds %ldus", timeout.tv_sec, timeout.tv_usec);
-    if (create_pid_file(pidfile) < 0) goto exit1;
 
     if (daemonize) {
-        if (daemon_init() < 0) goto exit2;
+        if (daemon_init() < 0) goto exit1;
     }
+
+    if (create_pid_file(pidfile) < 0) goto exit1;
 
     if (virtual_mouse_create(uinput_device)< 0) goto exit2;
     error = event_loop(&timeout);
