@@ -29,6 +29,40 @@
 
 static int uifd; /* Clicklock device file descriptor */
 
+/*
+TODO: Use libevdev (or at least update to uinput version 5.
+      For create input devices
+      (Ref: https://www.freedesktop.org/software/libevdev/doc/latest/)
+      (Ref: https://www.kernel.org/doc/html/latest/input/uinput.html)
+*/
+/*
+FIXME: Make udev aware of vendor/product/version properties.
+       ID_VENDOR, ID_VENDOR_ENC or ID_VENDOR_ID.
+       It only shows up on parent device.
+           Should I need to manually add them?
+           Change bustype from BUS_VIRTUAL to BUS_USB?
+                currently this doesn'y make any difference
+       check this after libevdev conversion.
+       (Ref: udev/udev-builtin-usb_id.c)
+
+    $ udevadm info -q all  /dev/input/event13
+    P: /devices/virtual/input/input22/event13
+    N: input/event13
+    E: DEVNAME=/dev/input/event13
+    E: DEVPATH=/devices/virtual/input/input22/event13
+    E: ID_INPUT=1
+    E: ID_INPUT_MOUSE=1
+    E: SUBSYSTEM=input
+
+    $ udevadm info -q all -p /devices/virtual/input/input22
+    P: /devices/virtual/input/input22
+    E: DEVPATH=/devices/virtual/input/input22
+    E: ID_INPUT=1
+    E: ID_INPUT_MOUSE=1
+    E: NAME="ClickLock Virtual Mouse"
+>>> E: PRODUCT=6/c1/c1/c1
+    E: SUBSYSTEM=input
+*/
 int virtual_mouse_create(const char *uinput_path) {
     struct uinput_user_dev uidev;
 

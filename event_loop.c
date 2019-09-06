@@ -32,6 +32,7 @@
 #include <libudev.h>
 #include <regex.h>
 
+
 static int free_pos;
 static struct pollfd idevs[POLLFD_MAX];
 
@@ -42,6 +43,7 @@ static inline unsigned int test_bit(const unsigned char* bitmask, int bit) {
     return bitmask[bit / 8] & (1 << (bit % 8));
 }
 
+/* TODO: Split the valid device detection and Clicklockd virtual mouse detection */
 static int valid_input_device(int devfd) {
     int ok = 0;
     struct stat devst;
@@ -55,10 +57,27 @@ static int valid_input_device(int devfd) {
     if (fstat(devfd, &devst) < 0) goto exit; 
     if (!S_ISCHR(devst.st_mode)) goto exit;                
 
-    /* Test buttons and relative axes */
+    /*
+    TODO: Relegate valid device detection to udev using:
+                udev_device_get_property_value(idev, "ID_INPUT_MOUSE")
+                udev_device_get_property_value(idev, "ID_INPUT_TOUCHPAD")
+                (Ref: udev/udev-builtin-input_id.c test_pointers())
+    */
+
+    /*
+       Test buttons and relative/absolute axes
+       In addtion for Key Event (EV_KEY) BTN_MOUSE checl for:
+           - Relative Events (EV_REL, REL_X, REL_Y) for mouse
+           - Absolute Events (EV_ABS, ABS_X, ABS_Y) for touchpad
+             Note: There are other divices with absulute movements
+             (e.g. touchscreens and tables) but those dosen't respond to
+             Key Events.
+    */
+
     bzero(&ev_bits, sizeof(ev_bits));
     ioctl(devfd, EVIOCGBIT(0, EV_MAX), ev_bits); 
-    if (!(test_bit(ev_bits, EV_KEY) && test_bit(ev_bits, EV_REL))) goto exit;
+    if (!(test_bit(ev_bits, EV_KEY) &&
+          (test_bit(ev_bits, EV_REL) || test_bit(ev_bits, EV_ABS)))) goto exit;
 
     bzero(&code_bits, sizeof(code_bits));
     ioctl(devfd, EVIOCGBIT(EV_KEY, KEY_MAX), code_bits); 
@@ -66,9 +85,27 @@ static int valid_input_device(int devfd) {
 
     bzero(&code_bits, sizeof(code_bits));
     ioctl(devfd, EVIOCGBIT(EV_REL, REL_MAX), code_bits); 
-    if (!(test_bit(code_bits, REL_X) && test_bit(code_bits, REL_Y))) goto exit;
+    if (!(test_bit(code_bits, REL_X) && test_bit(code_bits, REL_Y))) {
+        bzero(&code_bits, sizeof(code_bits));
+        ioctl(devfd, EVIOCGBIT(EV_ABS, ABS_MAX), code_bits);
+        if (!(test_bit(code_bits, ABS_X) && test_bit(code_bits, ABS_Y))) goto exit;
+
+    }
+
+    /* We MUST to exclude clicklock virtual mouse */
+    /*
+    TODO: Relegate the Clicklockd virtual mouse detection.
+          2 options:
+           1) Use udev, but currently for some reason it didn't read
+              vendor/product/version properties.
+              Should I need to add thos properties? I need to check this
+              after using libevdev for creating the virtual mouse.
+
+           2) Use libevdev to access vendor information
+             (Ref: https://www.freedesktop.org/software/libevdev/doc/latest/)
+             (Ref: https://www.kernel.org/doc/html/latest/input/uinput.html)
+    */
     
-    /* Test clicklock virtual mouse */
     if (ioctl(devfd, EVIOCGID, &iid) < 0) goto exit;
     if (iid.vendor == CLICKLOCK_VMOUSE_VENDOR 
             && iid.product == CLICKLOCK_VMOUSE_PRODUCT
@@ -112,6 +149,9 @@ static int scan_devices(struct udev *udev) {
 
     udev_enumerate_add_match_subsystem(udev_enum, "input");
     udev_enumerate_add_match_sysname(udev_enum, "event[0-9]*");
+    /* Only search for mouse-like (including trackballs) and touchpad devices  */
+    udev_enumerate_add_match_property(udev_enum, "ID_INPUT_MOUSE", "1");
+    udev_enumerate_add_match_property(udev_enum, "ID_INPUT_TOUCHPAD", "1");
     udev_enumerate_scan_devices(udev_enum);
     devices = udev_enumerate_get_list_entry(udev_enum);
 
