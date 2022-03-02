@@ -8,7 +8,7 @@ drop but without having to hold the mouse button for a long time
 
 ## Requirements
   - Linux with gcc
-  - libudev-dev
+  - libudev-dev (libgudev-devel in CentOS/Fedora)
 
 For Ubuntu:
 ```sh
