@@ -21,3 +21,6 @@ include .depend
 
 clean clear:
 	rm -f $(OBJECTS) $(EXECUTABLE) ./.depend
+
+install: clicklockd
+	cp $< /usr/local/bin
