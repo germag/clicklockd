@@ -26,8 +26,8 @@ tar xf master.tar.gz
 cd clicklockd-master
 make
 sudo make install
-
 ```
+
 ### Enabling clicklockd permanently with systemd
 
 ```sh
