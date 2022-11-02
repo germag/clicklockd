@@ -3,17 +3,37 @@
 Clicklockd enables you to highlight or drag without holding down the mouse button.
 This feature allows you to hold the mouse button for a few seconds, move the mouse
 to the new location, and then click it again. The effect is the same as a drag and
-drop but without having to hold the mouse button for a long time
+drop but without having to hold the mouse button for a long time.
 
 
 ## Requirements
+
   - Linux with gcc
-  - libudev-dev (libgudev-devel in CentOS/Fedora)
+  - libudev
 
-For Ubuntu:
 ```sh
-sudo apt install build-essential libudev-dev
+sudo apt install build-essential libudev-dev # Debian, Ubuntu, and derivatives
+```
+```sh
+sudo dnf install systemd-devel # Fedora, CentOS, RHEL, and derivatives
+```
 
+## Installation
+
+```sh
+wget https://github.com/germag/clicklockd/archive/refs/heads/master.tar.gz
+tar xf master.tar.gz
+cd clicklockd-master
+make
+sudo make install
+
+```
+### Enabling clicklockd permanently with systemd
+
+```sh
+sudo install --mode 644 clicklockd.service /etc/systemd/system
+sudo systemctl daemon-reload
+sudo systemctl enable --now clicklockd.service
 ```
 
 ## Options
@@ -37,5 +57,3 @@ This option tells clicklockd to use the specified file as its pidfile.  If the f
 
 **-u uinput device**  
 Set uinput device. Requires a 2.6 kernel with uinput support. Default is /dev/uinput.
-
-
