@@ -1,0 +1,8 @@
+[Unit]
+Description=highlight or drag without holding down the mouse button
+
+[Service]
+ExecStart=/usr/local/bin/clicklockd
+
+[Install]
+WantedBy=multi-user.target
