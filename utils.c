@@ -69,6 +69,7 @@ int create_pid_file(const char *pidfile) {
 
     assert(pidfile != NULL);
 
+    errno = 0;
     if ((pidf = fopen(pidfile, "w")) == NULL) goto exit;
     pid = getpid();
     fprintf(pidf,"%d\n", pid);
