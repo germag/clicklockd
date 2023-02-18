@@ -38,10 +38,10 @@ sudo systemctl enable --now clicklockd.service
 
 ## Options
 
-**-h**  
+**-h, --help**  
 Print help and exit.
 
-**-t timeout[s|ms]**  
+**-t, --holding-time <time[s|ms]>**
 Set how many seconds (s) or milliseconds (ms) you need to hold down a mouse or
 trackball button before your click is locked. You can use real numbers or integers.
 If the unit of time is not specified, clicklockd assumes seconds (s).
@@ -49,11 +49,16 @@ Default is 2 seconds.
 
 Ex: -t 1.5s (or -t 1.5) is the same as -t 1500ms
 
-**-b**  
-Run in the background (as a Unix daemon).
+**-b, --daemonize**  
+Run clicklockd as background process (as a Unix daemon).
 
-**-p pid file**  
+**-p, --pidfile <pidfile>**  
 This option tells clicklockd to use the specified file as its pidfile.  If the file exists, it will be removed and over-written.  Default is /var/run/clicklockd.pid.
 
-**-u uinput device**  
+\t\t\tSet pid file (default: %s)\n"
+
+**-u, --uinput-device <uinput device>**  
 Set uinput device. Requires a 2.6 kernel with uinput support. Default is /dev/uinput.
+
+**--left-handed**
+Left-handed mode switches the left and right buttons.
