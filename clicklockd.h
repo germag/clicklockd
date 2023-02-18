@@ -51,6 +51,8 @@ int  event_loop(const struct timeval *timeout);
 int  vmouse_create(const char *uinput_path);
 void vmouse_destroy(void);
 void vmouse_send_btn_event(int down);
+void vmouse_set_left_handed_mode(void);
+int  vmouse_get_primary_btn(void);
 
 /* Utils */
 int  daemon_init();

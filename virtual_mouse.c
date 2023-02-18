@@ -28,6 +28,7 @@
 
 /* Private state and functions */
 static int uifd; /* Clicklock device file descriptor */
+static int primary_btn = BTN_LEFT; /* Main mouse button */
 
 static void send_ev(int fd, int type, int code, int value);
 
@@ -74,8 +75,16 @@ void vmouse_destroy(void) {
 }
 
 void vmouse_send_btn_event(int down) {
-    send_ev(uifd, EV_KEY, BTN_MOUSE, down);
+    send_ev(uifd, EV_KEY, primary_btn, down);
     send_ev(uifd, EV_SYN, SYN_REPORT, 0);
+}
+
+void vmouse_set_left_handed_mode(void) {
+    primary_btn = BTN_RIGHT;
+}
+
+int vmouse_get_primary_btn(void) {
+    return primary_btn;
 }
 
 static void send_ev(int fd, int type, int code, int value) {

@@ -62,7 +62,7 @@ static int valid_input_device(int devfd) {
 
     bzero(&code_bits, sizeof(code_bits));
     ioctl(devfd, EVIOCGBIT(EV_KEY, KEY_MAX), code_bits); 
-    if (!test_bit(code_bits, BTN_MOUSE)) goto exit;
+    if (!test_bit(code_bits, vmouse_get_primary_btn())) goto exit;
 
     bzero(&code_bits, sizeof(code_bits));
     ioctl(devfd, EVIOCGBIT(EV_REL, REL_MAX), code_bits); 
@@ -183,7 +183,7 @@ static int do_event_loop(struct udev_monitor *udev_mon, const struct timeval *ti
             if ((idevs[i].revents & POLLIN)) { 
                 struct input_event ev;
                 if ((read(idevs[i].fd, &ev, sizeof(ev)) == sizeof(ev))
-                        && (ev.type == EV_KEY && ev.code == BTN_MOUSE)) {
+                        && (ev.type == EV_KEY && ev.code == vmouse_get_primary_btn())) {
                     state(&ev, timeout);
                 }
             }

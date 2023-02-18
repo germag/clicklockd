@@ -26,7 +26,6 @@
 
 int timer_parse(const char *str, struct timeval *timeout);
 
-
 int main(int argc, char* argv[]) {
     int opt;
     int error = 1;
@@ -42,6 +41,7 @@ int main(int argc, char* argv[]) {
             { "holding-time",   required_argument, NULL, 't' },
             { "pidfile",   required_argument, NULL, 'p' },
             { "uinput-device",  required_argument, NULL, 'u' },
+            { "left-handed",  no_argument, NULL, 1 },
             { NULL,       0, NULL, 0   }   /* Required at end of array.  */
     };
 
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
                 break;
             case 't':
                 error = timer_parse(optarg, &timeout);
-                if (error) goto exit2;
+                if (error) goto usage;
                 break;
             case 'p':
                 pidfile = strdup(optarg);
@@ -60,10 +60,12 @@ int main(int argc, char* argv[]) {
             case 'u':
                 uinput_device = strdup(optarg);
                 break;
+            case 1:
+                vmouse_set_left_handed_mode();
+                break;
             case 'h': /* fall through */
             default:
-                usage(stdout, argv[0]);
-                exit(EXIT_FAILURE);
+                goto usage;
         }
     }
 
@@ -88,6 +90,9 @@ exit2:
 exit1:
     log_info("Exit");
     if (!error) exit(EXIT_SUCCESS);
+    exit(EXIT_FAILURE);
+usage:
+    usage(stdout, argv[0]);
     exit(EXIT_FAILURE);
 }
 
