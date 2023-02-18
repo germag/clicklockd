@@ -81,14 +81,13 @@ int main(int argc, char* argv[]) {
 
     if (vmouse_create(uinput_device)< 0) goto exit2;
 
-    log_info("Init with timeout: %lds %ldus", timeout.tv_sec, timeout.tv_usec);
+    log_info("Init with timeout: %lds %ldus\n", timeout.tv_sec, timeout.tv_usec);
     error = event_loop(&timeout);
     vmouse_destroy();
     
 exit2:
     unlink(pidfile);
 exit1:
-    log_info("Exit");
     if (!error) exit(EXIT_SUCCESS);
     exit(EXIT_FAILURE);
 usage:

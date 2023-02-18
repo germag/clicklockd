@@ -27,7 +27,6 @@
 #include <errno.h>
 #include <linux/input.h>
 #include <linux/uinput.h>
-#include <syslog.h>
 #include <string.h>
 #include <assert.h>
 #include <sys/time.h>
@@ -60,9 +59,13 @@ int  create_pid_file(const char *pidfile);
 void usage(FILE *out, const char *pname);
 
 /* Logger */
-#define log_errno(err) syslog(LOG_ERR, "%s: %s",__func__, strerror(err))
-#define log_error(errstr) syslog(LOG_ERR, "%s: %s",__func__, errstr)
-#define log_warning(...) syslog(LOG_WARNING, __VA_ARGS__) 
-#define log_info(...) syslog(LOG_INFO, __VA_ARGS__) 
+typedef enum { LOGGER_LOG_ERROR, LOGGER_LOG_WARN, LOGGER_LOG_INFO, LOGGER_LOG_DEBUG } LOGGER_LOG_LEVEL;
+void logger_log(LOGGER_LOG_LEVEL level, const char *fmt, ...);
+void logger_set_level(LOGGER_LOG_LEVEL level);
+
+#define log_errno(err) logger_log(LOGGER_LOG_ERROR, "ERROR: %s: %s\n",__func__, strerror(err))
+#define log_error(errstr) logger_log(LOGGER_LOG_ERROR, "ERROR: %s: %s\n",__func__, errstr)
+#define log_warning(fmt, ...) logger_log(LOGGER_LOG_WARN, fmt, __VA_ARGS__)
+#define log_info(fmt, ...) logger_log(LOGGER_LOG_INFO, fmt, __VA_ARGS__)
 
 #endif

@@ -125,7 +125,7 @@ static int scan_devices(struct udev *udev) {
         idev = udev_device_new_from_syspath(udev, syspath);
         devnode = udev_device_get_devnode(idev);
         if ((fd = open_device(devnode)) < 0) continue;
-        log_info("Device found: %s", devnode);
+        log_info("Device found: %s\n", devnode);
         idevs[free_pos].fd = fd;
         free_pos++;
         if (free_pos >= POLLFD_MAX) break;
@@ -141,12 +141,12 @@ static void add_device(const char *devnode) {
     assert(devnode != NULL);
 
     if (free_pos >= POLLFD_MAX) { 
-        log_warning("Not space left for device: %s", devnode);
+        log_warning("Not space left for device: %s\n", devnode);
         return;
     } 
 
     if((fd = open_device(devnode)) != -1) {
-        log_info("New device found: %s", devnode);
+        log_info("New device found: %s\n", devnode);
         idevs[free_pos].fd = fd;    
         idevs[free_pos].revents = 0;    
         free_pos++;
@@ -166,7 +166,7 @@ static int do_event_loop(struct udev_monitor *udev_mon, const struct timeval *ti
             struct signalfd_siginfo sfdi;
             if (read(idevs[0].fd, &sfdi, sizeof(sfdi)) == sizeof(sfdi)) {
                if (sfdi.ssi_signo == SIGTERM) break;  /* Got SIGTERM exiting */
-               log_warning("Unexpected signal: %d", sfdi.ssi_signo);
+               log_warning("Unexpected signal: %d\n", sfdi.ssi_signo);
             }
         }
 
