@@ -48,9 +48,9 @@ int  event_loop(const struct timeval *timeout);
 #define CLICKLOCK_VMOUSE_PRODUCT   0XC1
 #define CLICKLOCK_VMOUSE_VERSION   0XC1
 
-int  virtual_mouse_create(const char *uinput_path);
-void virtual_mouse_destroy(void);
-void send_btn_event(int down);
+int  vmouse_create(const char *uinput_path);
+void vmouse_destroy(void);
+void vmouse_send_btn_event(int down);
 
 /* Utils */
 int  daemon_init();

@@ -26,10 +26,14 @@
 #include <fcntl.h>
 #include <strings.h>
 
-
+/* Private state and functions */
 static int uifd; /* Clicklock device file descriptor */
 
-int virtual_mouse_create(const char *uinput_path) {
+static void send_ev(int fd, int type, int code, int value);
+
+/* Public functions */
+
+int vmouse_create(const char *uinput_path) {
     struct uinput_user_dev uidev;
 
     assert(uinput_path != NULL);
@@ -64,9 +68,14 @@ exit0:
     return -1;
 }
 
-void virtual_mouse_destroy(void) {
+void vmouse_destroy(void) {
     ioctl(uifd, UI_DEV_DESTROY);
     close(uifd);
+}
+
+void vmouse_send_btn_event(int down) {
+    send_ev(uifd, EV_KEY, BTN_MOUSE, down);
+    send_ev(uifd, EV_SYN, SYN_REPORT, 0);
 }
 
 static void send_ev(int fd, int type, int code, int value) {
@@ -76,10 +85,5 @@ static void send_ev(int fd, int type, int code, int value) {
     ev.value = value;
     gettimeofday(&ev.time, NULL);
     if ((write(fd, &ev, sizeof(ev))) <= 0) log_errno(errno);
-}
-
-void send_btn_event(int down) {
-    send_ev(uifd, EV_KEY, BTN_MOUSE, down);
-    send_ev(uifd, EV_SYN, SYN_REPORT, 0);
 }
 

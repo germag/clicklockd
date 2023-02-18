@@ -46,7 +46,7 @@ static void state_init(const struct input_event *ev, const struct timeval *timeo
     if (IS_DOWN_EVENT(ev)) {
         down_ev_time = ev->time;
         state = state_btn_down;
-        send_btn_event(GET_EVENT(ev));
+        vmouse_send_btn_event(GET_EVENT(ev));
     } else { 
         state = state_btn_up; // Release event
     }
@@ -58,7 +58,7 @@ static void state_btn_up(const struct input_event *ev, const struct timeval *tim
     if (IS_DOWN_EVENT(ev)) {
         down_ev_time = ev->time;
         state = state_btn_down;
-        send_btn_event(GET_EVENT(ev));
+        vmouse_send_btn_event(GET_EVENT(ev));
     } 
 }
 
@@ -72,7 +72,7 @@ static void state_btn_down(const struct input_event *ev, const struct timeval *t
             state = state_locked; // Click locked
         } else {
             state = state_btn_up;
-            send_btn_event(GET_EVENT(ev));
+            vmouse_send_btn_event(GET_EVENT(ev));
         }
     }
 }
@@ -82,7 +82,7 @@ static void state_locked(const struct input_event *ev, const struct timeval *tim
 
     if (IS_RELEASE_EVENT(ev)) {
         state = state_btn_up; // Click unlocked
-        send_btn_event(GET_EVENT(ev));
+        vmouse_send_btn_event(GET_EVENT(ev));
     }
 }
 
