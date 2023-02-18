@@ -22,6 +22,7 @@
 #include <signal.h>
 #include <limits.h>
 #include <math.h>
+#include <getopt.h>
 
 int timer_parse(const char *str, struct timeval *timeout);
 
@@ -29,14 +30,22 @@ int timer_parse(const char *str, struct timeval *timeout);
 int main(int argc, char* argv[]) {
     int opt;
     int error = 1;
-    int daemonize;
+    int daemonize = 0;
     sigset_t sigset;
     struct timeval timeout = {.tv_sec = BTN_TIMEOUT_SEC, .tv_usec = BTN_TIMEOUT_USEC};
     char *pidfile = PID_FILE;
     char *uinput_device = DEFAULT_UINPUT_DEV;
     
-    daemonize = 0;
-    while((opt = getopt(argc, argv, "hbt:p:u:")) != -1) {
+    const struct option long_options[] = {
+            { "help",     no_argument, NULL, 'h' },
+            { "daemonize",     no_argument, NULL, 'b' },
+            { "holding-time",   required_argument, NULL, 't' },
+            { "pidfile",   required_argument, NULL, 'p' },
+            { "uinput-device",  required_argument, NULL, 'u' },
+            { NULL,       0, NULL, 0   }   /* Required at end of array.  */
+    };
+
+    while((opt = getopt_long (argc, argv, "hbt:p:u:", long_options, NULL)) != -1) {
         switch(opt) {
             case 'b': 
                 daemonize = 1;
@@ -89,17 +98,17 @@ int timer_parse(const char *str, struct timeval *timeout)
     double parameter_value = strtod(str, &str_last);
 
     if (str_last == str) {
-        fprintf(stderr, "Invalid parameter: timeout has no digits\n");
+        fprintf(stderr, "Invalid parameter: holding time has no digits\n");
         return EXIT_FAILURE;
     }
 
     if ((parameter_value == HUGE_VAL || parameter_value == -HUGE_VAL) && errno == ERANGE) {
-        fprintf(stderr, "Invalid parameter: '%s' timeout out of  range\n", str);
+        fprintf(stderr, "Invalid parameter: '%s' holding time out of range\n", str);
         return EXIT_FAILURE;
     }
 
     if (parameter_value < 0) {
-        fprintf(stderr, "Invalid parameter: negative timeout\n");
+        fprintf(stderr, "Invalid parameter: negative holding time\n");
         return EXIT_FAILURE;
     }
 
@@ -118,7 +127,7 @@ int timer_parse(const char *str, struct timeval *timeout)
      * Since the timeout will be relatively small, this should be fine.
      */
     if (!(parameter_value < (LONG_MAX/factor))) {
-            fprintf(stderr, "Invalid parameter: '%s' timeout out of  range\n", str);
+            fprintf(stderr, "Invalid parameter: '%s' holding time out of  range\n", str);
             return EXIT_FAILURE;
     }
 
