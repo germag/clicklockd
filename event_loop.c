@@ -55,10 +55,11 @@ static int valid_input_device(int devfd) {
     if (fstat(devfd, &devst) < 0) goto exit; 
     if (!S_ISCHR(devst.st_mode)) goto exit;                
 
-    /* Test buttons and relative axes */
+    /* Test buttons and relative and absolute axes */
     bzero(&ev_bits, sizeof(ev_bits));
     ioctl(devfd, EVIOCGBIT(0, EV_MAX), ev_bits); 
-    if (!(test_bit(ev_bits, EV_KEY) && test_bit(ev_bits, EV_REL))) goto exit;
+    if (!(test_bit(ev_bits, EV_KEY) &&
+          (test_bit(ev_bits, EV_REL) || test_bit(ev_bits, EV_ABS)))) goto exit;
 
     bzero(&code_bits, sizeof(code_bits));
     ioctl(devfd, EVIOCGBIT(EV_KEY, KEY_MAX), code_bits); 
@@ -66,8 +67,12 @@ static int valid_input_device(int devfd) {
 
     bzero(&code_bits, sizeof(code_bits));
     ioctl(devfd, EVIOCGBIT(EV_REL, REL_MAX), code_bits); 
-    if (!(test_bit(code_bits, REL_X) && test_bit(code_bits, REL_Y))) goto exit;
-    
+    if (!(test_bit(code_bits, REL_X) && test_bit(code_bits, REL_Y))) {
+        bzero(&code_bits, sizeof(code_bits));
+        ioctl(devfd, EVIOCGBIT(EV_ABS, ABS_MAX), code_bits);
+        if (!(test_bit(code_bits, ABS_X) && test_bit(code_bits, ABS_Y))) goto exit;
+    }
+
     /* Test clicklock virtual mouse */
     if (ioctl(devfd, EVIOCGID, &iid) < 0) goto exit;
     if (iid.vendor == CLICKLOCK_VMOUSE_VENDOR 
@@ -112,6 +117,9 @@ static int scan_devices(struct udev *udev) {
 
     udev_enumerate_add_match_subsystem(udev_enum, "input");
     udev_enumerate_add_match_sysname(udev_enum, "event[0-9]*");
+    /* Only search for mouse-like (including trackballs) and touchpad devices  */
+    udev_enumerate_add_match_property(udev_enum, "ID_INPUT_MOUSE", "1");
+    udev_enumerate_add_match_property(udev_enum, "ID_INPUT_TOUCHPAD", "1");
     udev_enumerate_scan_devices(udev_enum);
     devices = udev_enumerate_get_list_entry(udev_enum);
 
