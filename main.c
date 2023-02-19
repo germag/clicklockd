@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     int daemonize = 0;
     sigset_t sigset;
     struct timeval timeout = {.tv_sec = BTN_TIMEOUT_SEC, .tv_usec = BTN_TIMEOUT_USEC};
-    char *pidfile = PID_FILE;
+    char *pidfile = NULL;
     char *uinput_device = DEFAULT_UINPUT_DEV;
     
     const struct option long_options[] = {
@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
         if (daemon_init() < 0) goto exit1;
     }
 
-    if (create_pid_file(pidfile) < 0) goto exit1;
+    if (pidfile != NULL && create_pid_file(pidfile) < 0) goto exit1;
 
     if (vmouse_create(uinput_device)< 0) goto exit2;
 

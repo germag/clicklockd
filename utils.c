@@ -38,10 +38,10 @@ void usage(FILE *out, const char *pname) {
                  "\t\t\t\t\t\taccepts both real numbers and integers (default: %ds)\n"
                  "\t\t\t\t\t\tEx: -t 2.5s is the same as -t 2500ms\n"
                  "\t\t\t\t\t\tNote: if the unit of time is not specified, clicklockd assumes seconds (s).\n"
-                 "\t-p, --pidfile <pidfile>\t\t\tSet pid file (default: %s)\n"
+                 "\t-p, --pidfile <pidfile>\t\t\tSet pid file\n"
                  "\t-u, --uinput-device <uinput device>\tSet uinput device (default: %s)\n"
                  "\t--left-handed\t\t\t\tLeft-handed mode switches the left and right buttons\n",
-                 pname, BTN_TIMEOUT_SEC, PID_FILE, DEFAULT_UINPUT_DEV);
+                 pname, BTN_TIMEOUT_SEC, DEFAULT_UINPUT_DEV);
 }
 
 int daemon_init() {
@@ -65,6 +65,8 @@ exit:
 }
 
 int create_pid_file(const char *pidfile) {
+    assert(pidfile != NULL);
+
     FILE *pidf;
     pid_t pid;
 
