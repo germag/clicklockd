@@ -15,7 +15,10 @@ drop but without having to hold the mouse button for a long time.
 sudo apt install build-essential libudev-dev # Debian, Ubuntu, and derivatives
 ```
 ```sh
-sudo dnf install systemd-devel # Fedora, CentOS, RHEL, and derivatives
+sudo dnf install make gcc systemd-devel # Fedora, CentOS, RHEL, and derivatives
+```
+```sh
+sudo zypper install make gcc systemd-devel # openSUSE, SLE, and derivatives
 ```
 
 ## Installation
@@ -45,20 +48,34 @@ Print help and exit.
 Set how many seconds (s) or milliseconds (ms) you need to hold down a mouse or
 trackball button before your click is locked. You can use real numbers or integers.
 If the unit of time is not specified, clicklockd assumes seconds (s).
-Default is 2 seconds.
-
-Ex: -t 1.5s (or -t 1.5) is the same as -t 1500ms
+Default is 2 seconds.  
+Ex: `-t 1.5s` (or `-t 1.5`) is the same as `-t 1500ms`
 
 **-b, --daemonize**  
 Run clicklockd as background process (as a Unix daemon).
 
 **-p, --pidfile <pidfile>**  
-This option tells clicklockd to use the specified file as its pidfile.  If the file exists, it will be removed and over-written.  Default is /var/run/clicklockd.pid.
-
-\t\t\tSet pid file (default: %s)\n"
+This option tells clicklockd to use the specified file as its pidfile. If the file exists, it will be removed and over-written. Default is `/var/run/clicklockd.pid`.
 
 **-u, --uinput-device <uinput device>**  
-Set uinput device. Requires a 2.6 kernel with uinput support. Default is /dev/uinput.
+Set uinput device. Requires a 2.6 kernel with uinput support. Default is `/dev/uinput`.
 
-**--left-handed**
+**--left-handed**  
 Left-handed mode switches the left and right buttons.
+
+### Making an option permanent
+
+Edit the service file `/etc/systemd/system/clicklockd.service`: add your desired option(s) at the end of the line `ExecStart=/usr/local/bin/clicklockd`.  
+Restart the service to apply the changes:
+```sh
+sudo systemctl daemon-reload
+sudo systemctl restart clicklockd.service
+```
+
+## Uninstallation
+
+```sh
+sudo systemctl disable --now clicklockd.service # disable the service
+sudo rm -f /etc/systemd/system/clicklockd.service
+sudo rm -f /usr/local/bin/clicklockd
+```
