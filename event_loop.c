@@ -183,6 +183,7 @@ static int do_event_loop(struct udev_monitor *udev_mon, const struct timeval *ti
             /* Device disconected or error */
             if (idevs[i].revents & (POLLHUP | POLLERR | POLLNVAL)){ 
                 free_pos--;
+                close(idevs[i].fd);
                 idevs[i].fd = idevs[free_pos].fd;
                 idevs[i].revents = idevs[free_pos].revents;
             }
