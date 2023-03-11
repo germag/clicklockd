@@ -1,5 +1,5 @@
 CC=cc
-CFLAGS=-c -O2 -Wall -Wextra -D_GNU_SOURCE --std=c99
+CFLAGS=-c -O2 -Wall -Wextra -D_GNU_SOURCE --std=c11
 LDFLAGS= -ludev
 SOURCES=$(wildcard *.c)
 HEADERS=$(wildcard *.h)
